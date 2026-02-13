@@ -1,0 +1,2 @@
+<script defer src="<?php echo site_url('plugins/toastr/toastr.min.js'); ?>" <?= csp_script_nonce() ?>></script>
+<link href="<?php echo site_url('plugins/toastr/toastr.min.css'); ?>" rel="stylesheet" <?= csp_style_nonce() ?> />

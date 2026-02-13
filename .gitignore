@@ -1,0 +1,4 @@
+app/.htaccess
+writable/
+vendor/
+.env
