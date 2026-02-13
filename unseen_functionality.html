@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unseen Functionality: Backend Calculation Logic</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #2c3e50;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        ul {
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Unseen Functionality: Backend Calculation Logic</h1>
+
+    <div class="section">
+        <p>The core value of this application lies in its "unseen" calculation logic within
+            <code>App\Controllers\CommonController.php</code>. While the UI is simple, the backend performs complex
+            regression-based estimates to determine crate weight and carbon footprint.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Core Logic Breakdown</h2>
+
+        <h3>1. Dimension Calculation (<code>getDimensionValues</code>)</h3>
+        <ul>
+            <li><strong>Input</strong>: Height, Width, Depth (in cm or inches).</li>
+            <li><strong>Normalization</strong>: Converts all inputs to <strong>Meters</strong>.</li>
+            <li><strong>Derived Metrics</strong>:
+                <ul>
+                    <li>Object Volume (V = H × W × D)</li>
+                    <li>Object Surface Area (Area = 2(HW + HD + WD))</li>
+                    <li>Inner Package Dimensions (calculated via linear regression based on object dimensions).</li>
+                    <li>Crate Outer Dimensions (calculated via linear regression).</li>
+                    <li>Crate Volume, Surface Area, Front Area, Footprint Area.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>2. Regression-Based Modeling (<code>getCalculatedValues</code>)</h3>
+        <p>The application uses a database-driven regression model (<code>DesignRegressionModel</code>) to estimate the
+            dimensions and weight of various crate components based on the object's properties.</p>
+        <ul>
+            <li><strong>Linear Regression Formula</strong>: y = mx + b
+                <ul>
+                    <li><strong>y</strong>: Target Variable (e.g., Inner Package Height).</li>
+                    <li><strong>x</strong>: Independent Variable (e.g., Object Height).</li>
+                    <li><strong>m</strong>: Slope (stored in <code>calculate_m</code>).</li>
+                    <li><strong>b</strong>: Intercept (stored in <code>calculate_b</code>).</li>
+                </ul>
+            </li>
+            <li><strong>Dynamic Component Calculation</strong>: The system iterates through a list of "Main Types"
+                (components) like:
+                <ul>
+                    <li>Object Wrap</li>
+                    <li>2D Tray Panel</li>
+                    <li>Foam Cushion Pads</li>
+                    <li>Plywood Crate Walls</li>
+                    <li>...and 20+ others.</li>
+                </ul>
+                <p>For each component, it selects the appropriate material (e.g., "PE film", "Plywood", "Pine lumber")
+                    based on the <strong>Crate Design</strong> (Economy, Mid-Range, Museum).</p>
+            </li>
+        </ul>
+
+        <h3>3. Weight and Carbon Calculation</h3>
+        <p>For each component:</p>
+        <ol>
+            <li><strong>Calculate Weight (W)</strong>:
+                <ul>
+                    <li>The code identifies the relevant geometric property (x) for the component (e.g., <em>Surface
+                            Area</em> for Plywood Walls, <em>Volume</em> for Handles).</li>
+                    <li>Applies the regression: W = m · x + b.</li>
+                </ul>
+            </li>
+            <li><strong>Calculate Carbon Footprint (CO<sub>2</sub>e)</strong>:
+                <ul>
+                    <li>Retrieves the <strong>Embodied Carbon Factor</strong> (E<sub>f</sub>) for the specific material
+                        from <code>MaterialByQuantityModel</code>.</li>
+                    <li>CO<sub>2</sub>e = W × E<sub>f</sub>.</li>
+                </ul>
+            </li>
+            <li><strong>Aggregation</strong>:
+                <ul>
+                    <li>Sums up W and CO<sub>2</sub>e for all components to get the total Crate Weight and Total
+                        Embodied Carbon.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>4. Transportation Emission (<code>carbonFootPrintValue</code>)</h3>
+        <ul>
+            <li>Calculates emissions for transport based on shipment method (Air, Road, Sea).</li>
+            <li>Logic includes specific multipliers for each mode:
+                <ul>
+                    <li><strong>Air Passenger</strong>: Fixed rate per passenger.</li>
+                    <li><strong>Air Freight</strong>: Weight × Distance × Factor.</li>
+                    <li><strong>Road/Sea Freight</strong>: Includes a base emission + overhead (e.g., +5% if freight >
+                        0).</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Key Database Models</h2>
+        <ul>
+            <li><strong>DesignRegressionModel</strong>: Stores the m and b values for each component relation.</li>
+            <li><strong>DesignRegressionVariableModel</strong>: Maps variables (e.g., "Inner package height") to their
+                text representation.</li>
+            <li><strong>MaterialByQuantityModel</strong>: Stores the Carbon Factors (E<sub>f</sub>) for materials.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Summary</h2>
+        <p>The "unseen" functionality is a flexible, data-driven engineering model that allows the application to
+            estimate complex physical crate properties and environmental impact from just three simple input dimensions.
+        </p>
+    </div>
+
+</body>
+
+</html>

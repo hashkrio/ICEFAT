@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Execution Guide</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #2c3e50;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        ul {
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Code Execution Guide</h1>
+
+    <div class="section">
+        <h2>Prerequisites</h2>
+        <ul>
+            <li><strong>Web Server</strong>: Apache (XAMPP/WAMP/Laragon) or Nginx.</li>
+            <li><strong>PHP</strong>: Version 8.1 or higher.</li>
+            <li><strong>Database</strong>: MySQL.</li>
+            <li><strong>Composer</strong>: For dependency management.</li>
+            <li><strong>Browser</strong>: Chrome, Firefox, or Edge.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Setup Instructions</h2>
+        <ol>
+            <li><strong>Database Setup</strong>:
+                <ul>
+                    <li>Create a new MySQL database (e.g., <code>icefat_db</code>).</li>
+                    <li>Import the database schema if provided (check <code>database.sql</code> or similar if exists,
+                        otherwise migration might be needed). <em>Note: No SQL file was explicitly seen in the root, but
+                            Models imply a schema.</em></li>
+                    <li>Configure <code>app/Config/Database.php</code> or <code>.env</code> with your database
+                        credentials.</li>
+                </ul>
+            </li>
+            <li><strong>Configuration</strong>:
+                <ul>
+                    <li>Rename <code>env</code> to <code>.env</code>.</li>
+                    <li>Set <code>CI_ENVIRONMENT = development</code> for debugging.</li>
+                    <li>Set <code>app.baseURL</code> to your local URL (e.g.,
+                        <code>http://localhost/ICEFAT/public/</code>).
+                    </li>
+                </ul>
+            </li>
+            <li><strong>Dependencies</strong>:
+                <ul>
+                    <li>Run <code>composer install</code> in the project root to install PHP dependencies.</li>
+                </ul>
+            </li>
+            <li><strong>Permissions</strong>:
+                <ul>
+                    <li>Ensure <code>writable/</code> folder is writable by the web server.</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>Running the Application</h2>
+
+        <h3>Option A: Using XAMPP/Local Web Server</h3>
+        <ol>
+            <li>Place the project folder <code>ICEFAT</code> in <code>htdocs</code> (e.g.,
+                <code>E:\xampp\htdocs\ICEFAT</code>).
+            </li>
+            <li>Start Apache and MySQL modules in XAMPP Control Panel.</li>
+            <li>Access the application in your browser: <code>http://localhost/ICEFAT/public/</code></li>
+        </ol>
+
+        <h3>Option B: Using CodeIgniter Spark Server</h3>
+        <ol>
+            <li>Open a terminal in the project root.</li>
+            <li>Run the command:
+                <pre><code>php spark serve</code></pre>
+            </li>
+            <li>Access the application at: <code>http://localhost:8080</code></li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>Login Credentials</h2>
+        <p>Use the following credentials to log in:</p>
+        <ul>
+            <li><strong>User</strong>: <code>app4icefat</code></li>
+            <li><strong>Password</strong>: <code>5r8U(A{7wXXa</code></li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Troubleshooting</h2>
+        <ul>
+            <li><strong>404 Not Found</strong>: Ensure <code>.htaccess</code> is configured correctly in
+                <code>public/</code> or that <code>mod_rewrite</code> is enabled in Apache. CodeIgniter 4 public folder
+                handling requires this.
+            </li>
+            <li><strong>Database Errors</strong>: Check <code>.env</code> database settings.</li>
+            <li><strong>Permission Errors</strong>: Check read/write permissions for the <code>writable</code>
+                directory.</li>
+        </ul>
+    </div>
+
+</body>
+
+</html>

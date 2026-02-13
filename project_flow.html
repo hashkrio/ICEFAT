@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Flow Documentation</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #2c3e50;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        ul {
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Project Flow Documentation</h1>
+
+    <div class="section">
+        <h2>Overview</h2>
+        <p>This project is a <strong>Carbon Footprint Calculator</strong> for crate packaging, built with
+            <strong>CodeIgniter 4</strong>. It allows users to calculate the carbon footprint of different crate designs
+            based on dimensions, materials, and transport methods.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Application Flow</h2>
+
+        <h3>1. Authentication</h3>
+        <ul>
+            <li><strong>Login</strong>: Users access the application via <code>/login</code>.
+                <ul>
+                    <li>Controller: <code>LoginController</code></li>
+                    <li>View: <code>login.php</code></li>
+                    <li>Auth Library: <code>CodeIgniter Shield</code></li>
+                </ul>
+            </li>
+            <li><strong>Redirect</strong>: Upon successful login, users are redirected to the dashboard
+                (<code>/home</code> or <code>/</code>).</li>
+        </ul>
+
+        <h3>2. Dashboard & Calculator (Main Interface)</h3>
+        <ul>
+            <li><strong>Route</strong>: <code>/home</code>, <code>/</code></li>
+            <li><strong>Controller</strong>: <code>Home::index</code></li>
+            <li><strong>View</strong>: <code>dashboard-list-3.php</code> (Main Interface),
+                <code>dashboard_3_script.php</code> (JS Logic)
+            </li>
+            <li><strong>Functionality</strong>:
+                <ol>
+                    <li><strong>Input</strong>: User selects units (Metric/Imperial), enters dimensions (Height, Width,
+                        Depth), and selects a Crate Design.</li>
+                    <li><strong>Real-time Calculation</strong>:
+                        <ul>
+                            <li>Triggered by input changes.</li>
+                            <li>AJAX Request: <code>POST /filter/get_values_by_crate_type</code></li>
+                            <li>Controller Method: <code>CommonController::getValuesByCrateType</code></li>
+                            <li>Returns: <code>weight_in_kg</code>, <code>embodied_carbon_factor_in_kg</code>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Transport Calculation</strong>:
+                        <ul>
+                            <li>User enters "Number of one-way trips".</li>
+                            <li>JS calculates <code>per_one_way_trip</code> emission.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Save/Add Crate</strong>:
+                        <ul>
+                            <li>User clicks "Add Crate".</li>
+                            <li>AJAX Request: <code>POST /filter/save_new</code></li>
+                            <li>Controller Method: <code>CommonController::saveNewCalculations</code></li>
+                            <li>Data stored in <code>DataList</code> model.</li>
+                        </ul>
+                    </li>
+                </ol>
+            </li>
+        </ul>
+
+        <h3>3. Data Tables & Visualization</h3>
+        <ul>
+            <li><strong>List View</strong>: The dashboard displays a list of calculated crates.
+                <ul>
+                    <li>Data Source: <code>ajax.calculation.all.data.list</code>
+                        (<code>CommonController::allDataList</code>).</li>
+                </ul>
+            </li>
+            <li><strong>Visualization</strong>: A Donut chart shows the distribution of carbon footprint by crate type
+                (ECONOMY, MID-RANGE, MUSEUM).</li>
+            <li><strong>Export</strong>: Users can export data to Excel or PDF.
+                <ul>
+                    <li>Routes: <code>/filter/export/excel</code>, <code>/filter/export/pdf</code>.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>4. Admin/Management (Hidden/Secondary Flows)</h3>
+        <ul>
+            <li><strong>User Management</strong>: <code>/users</code> -> <code>Home::users</code> ->
+                <code>user-list.php</code>.
+            </li>
+            <li><strong>Material & Emission Factors</strong>:
+                <ul>
+                    <li>Material Quantity: <code>/material/quantity</code></li>
+                    <li>Crate Design: <code>/crate/design</code></li>
+                    <li>Regression Models: <code>/design/regression</code></li>
+                    <li>Transportation Emission: <code>/transportation/emission</code></li>
+                    <li>Crate Types: <code>/crate/type</code></li>
+                    <li>Model Options: <code>/model/option</code></li>
+                </ul>
+            </li>
+            <li>These routes allow managing the constants and factors used in calculations.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Architectural Components</h2>
+        <ul>
+            <li><strong>Controllers</strong>:
+                <ul>
+                    <li><code>App\Controllers\Home</code>: Handles Page views.</li>
+                    <li><code>App\Controllers\CommonController</code>: Handles AJAX requests, business logic,
+                        calculations, and data export.</li>
+                    <li><code>App\Controllers\LoginController</code>: Handles Authentication.</li>
+                </ul>
+            </li>
+            <li><strong>Models</strong>:
+                <ul>
+                    <li><code>CrateTypeModel</code>: Storage for crate types (Economy, Museum, etc.).</li>
+                    <li><code>DataList</code>: Stores user saved calculations.</li>
+                    <li><code>DesignRegressionModel</code> & <code>DesignRegressionVariableModel</code>: Stores
+                        coefficients (M and B values) for regression-based weight calculations.</li>
+                    <li><code>MaterialByQuantityModel</code>, <code>MaterialByCrateDesignModel</code>: Stores material
+                        properties.</li>
+                    <li><code>TransportationEmissionFactorModel</code>: Stores emission factors for different shipment
+                        methods.</li>
+                    <li><code>UserModel</code>: User management.</li>
+                </ul>
+            </li>
+            <li><strong>Views</strong>:
+                <ul>
+                    <li>Layouts: <code>app/Views/layouts/</code> (Master layout).</li>
+                    <li>Pages: <code>dashboard-list-3.php</code>, <code>login.php</code>, etc.</li>
+                </ul>
+            </li>
+            <li><strong>Database</strong>: MySQL (implied by CodeIgniter models).</li>
+        </ul>
+    </div>
+
+</body>
+
+</html>
